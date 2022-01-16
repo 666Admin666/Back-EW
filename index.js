@@ -25,7 +25,7 @@ app.use(function (req, res, next) {
 
 const DB_NAME = 'elementalwars'
 const USER_NAME = 'root'
-const PASSWORD = ''
+const PASSWORD = 'password'
 
 const sequelize = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
   host: 'localhost',
