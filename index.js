@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import express from "express"
 
-const PORT = 4000;
+const PORT = 80;
 
 
 
@@ -12,7 +12,7 @@ app.use(express.json())
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://elemental-wars.com');
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT');
     // Request headers you wish to allow
