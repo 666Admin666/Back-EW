@@ -25,6 +25,7 @@ app.use(function (req, res, next) {
 
 const DB_NAME = 'elementalwars'
 const USER_NAME = 'root'
+//const PASSWORD = ''
 const PASSWORD = 'password'
 
 const sequelize = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
@@ -88,7 +89,7 @@ app.get('/wandsone/:IdAsset', async(req, res) => {
 })
 
 app.get('/wand/:IdAsset', async(req, res) => {
-   
+    const time = new Date(); 
     try {  
         const wand  = await Wands.findAll({
             where:{
@@ -96,10 +97,13 @@ app.get('/wand/:IdAsset', async(req, res) => {
             }
         }) 
         if (wand.length == 0) {
-            res.json(false)
+            res.json(0)
         }
-        else{
-            res.json(true)
+        else if (time < wand[0].EndFarm){
+            res.json(1)
+        }
+        else if (time > wand[0].EndFarm){
+            res.json(2)
         }
     } 
     catch (error) 
