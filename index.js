@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import express from "express"
 
-const PORT = 80;
+const PORT = 4000;
 
 
 
