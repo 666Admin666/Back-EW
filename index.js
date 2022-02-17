@@ -22,8 +22,8 @@ app.use(function (req, res, next) {
 
 const DB_NAME = 'elementalwars'
 const USER_NAME = 'root'
-//const PASSWORD = ''
-const PASSWORD = 'password'
+const PASSWORD = ''
+//const PASSWORD = 'password'
 
 const wands = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
   host: 'localhost',
@@ -152,7 +152,12 @@ app.get('/staking/:Mail' ,async(req, res) => {
                 Mail:req.params.Mail
             }
         }) 
-        res.json(staked);
+        if (staked.length == 0) {
+            res.json("null")
+        }
+        else{
+            res.json(staked);
+        }
     }catch(e){
         res.status(500).json(e);
     }
