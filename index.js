@@ -4,9 +4,6 @@ import express from "express"
 const PORT = 4000;
 
 
-
-// use it before all route definitions
-
 const app = express()
 app.use(express.json())
 app.use(function (req, res, next) {
@@ -25,18 +22,25 @@ app.use(function (req, res, next) {
 
 const DB_NAME = 'elementalwars'
 const USER_NAME = 'root'
-//const PASSWORD = ''
-const PASSWORD = 'password'
+const PASSWORD = ''
+//const PASSWORD = 'password'
 
-const sequelize = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
+const wands = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
   host: 'localhost',
   dialect: 'mysql',
   define: {
     timestamps: false
 }
 })
+const staking = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
+    host: 'localhost',
+    dialect: 'mysql',
+    define: {
+      timestamps: false
+  }
+  })
 
-const Wands = sequelize.define('wands', {
+const Wands = wands.define('wands', {
     IdAsset: {
         primaryKey: true,
         autoIncrement: false,
@@ -56,6 +60,35 @@ const Wands = sequelize.define('wands', {
         allowNull: false
     } 
 })
+const Staking = staking.define('staking', {
+    IdAsset: {
+        primaryKey: true,
+        autoIncrement: false,
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    Rarity: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    Name: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    IdTemplate: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    Ability: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    Mail: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
+})
+
 
 app.get('/',(req,res)=>
 {
@@ -112,6 +145,19 @@ app.get('/wand/:IdAsset', async(req, res) => {
     }
 })
 
+app.get('/staking/:Mail' ,async(req, res) => {
+    try{
+        const staked  = await Staking.findAll({
+            where:{
+                Mail:req.params.Mail
+            }
+        }) 
+        res.json(staked);
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+
 app.post('/wands', async(req, res) => {
     try{
         const {IdAsset , Rarity }  = req.body;
@@ -131,6 +177,16 @@ app.post('/wands', async(req, res) => {
         }
         const post = await Wands.create({IdAsset,Rarity,StartFarm,EndFarm});
         res.json(EndFarm);
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+
+app.post('/staking', async(req, res) => {
+    try{
+        const {IdAsset , Rarity ,Name, IdTemplate ,Ability ,Mail }  = req.body;
+        await Staking.create({IdAsset,Rarity,Name,IdTemplate,Ability,Mail});
+        res.json("OK");
     }catch(e){
         res.status(500).json(e);
     }
@@ -183,7 +239,8 @@ app.put('/wands', async(req, res) => {
 
 async function start() {
     try {
-      await sequelize.sync()
+      await wands.sync()
+      await staking.sync()
       app.listen(PORT)
     } catch (e) {
       console.log(e)
