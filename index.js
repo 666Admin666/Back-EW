@@ -90,6 +90,12 @@ const Staking = staking.define('staking', {
 })
 
 
+app.get('/time',(req,res)=>
+{
+    const time = new Date(); 
+    res.send(time);
+})
+
 app.get('/',(req,res)=>
 {
     const check = "server is working";
