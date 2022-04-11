@@ -82,7 +82,6 @@ const Staking = wands.define('staking', {
         allowNull: false
     }
 })
-
 const User = wands.define('users', {
     UserId: {
         primaryKey: true,
@@ -234,6 +233,10 @@ const Skill = wands.define('skills', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    Numbers:{
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
     Type: {
         type: Sequelize.STRING,
         allowNull: false
@@ -360,6 +363,15 @@ app.get('/lands/:UserId' ,async(req, res) => {
         else{
             res.json(lands);
         }
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.post('/lands' ,async(req, res) => {
+    try{
+        const {Name , RarityId ,UserId }  = req.body;
+        await Land.create({Name,RarityId,UserId}) 
+        res.json("Success");
     }catch(e){
         res.status(500).json(e);
     }
