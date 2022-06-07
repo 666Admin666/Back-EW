@@ -499,7 +499,7 @@ app.put('/coinsminus' ,async(req, res) => {
                 UserId:UserId
             }
         })
-        var newCoins = data.Coins - Amount
+        var newCoins = Number(data.Coins) - Number(Amount)
         await User.update({
             Coins:newCoins
         },{
@@ -521,7 +521,7 @@ app.put('/coinsplus' ,async(req, res) => {
                 UserId:UserId
             }
         })
-        var newCoins = data.Coins + Amount
+        var newCoins = Number(data.Coins) + Number(Amount)
         await User.update({
             Coins:newCoins
         },{
