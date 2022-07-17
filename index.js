@@ -22,8 +22,8 @@ app.use(function (req, res, next) {
 
 const DB_NAME = 'elementalwars'
 const USER_NAME = 'root'
-//const PASSWORD = ''
-const PASSWORD = 'password'
+const PASSWORD = ''
+//const PASSWORD = 'password'
 
 const wands = new Sequelize(DB_NAME, USER_NAME, PASSWORD, {
   host: 'localhost',
@@ -138,6 +138,22 @@ const Resourse = wands.define('resourses', {
         allowNull: false
     }
 })
+const Scroll = wands.define('scrolls', {
+    AssetId: {
+        primaryKey: true,
+        autoIncrement: false,
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    RarityId: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    UserId: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    }
+})
 const Wands = wands.define('wands', {
     AssetId: {
         primaryKey: true,
@@ -162,11 +178,23 @@ const Wands = wands.define('wands', {
         allowNull: false
     }
 })
-const Land = wands.define('lands', {
-    LandId: {
+const WhiteList = wands.define('whitelists', {
+    AssetId: {
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: false,
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    UserId: {
         type: Sequelize.INTEGER,
+        allowNull: false
+    }
+})
+const Land = wands.define('lands', {
+    AssetId: {
+        primaryKey: true,
+        autoIncrement: false,
+        type: Sequelize.STRING,
         allowNull: false
     },
     Name: {
@@ -179,6 +207,30 @@ const Land = wands.define('lands', {
     },
     UserId: {
         type: Sequelize.INTEGER,
+        allowNull: false
+    }
+})
+const Base = wands.define('bases', {
+    BaseId: {
+        primaryKey: true,
+        autoIncrement: true,
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    Name: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    Level: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    Point: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    AssetId: {
+        type: Sequelize.STRING,
         allowNull: false
     }
 })
@@ -203,6 +255,10 @@ const Magicon = wands.define('magicons', {
     },
     Breeding: {
         type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    AssetId: {
+        type: Sequelize.STRING,
         allowNull: false
     },
     UserId: {
@@ -300,7 +356,12 @@ const Type = wands.define('types', {
     }
 })
 
+
+
 User.hasMany(UserResourse ,{ as: 'UserRes' , foreignKey: 'UserId'})
+User.hasMany(WhiteList ,{ as: 'UserWLs' , foreignKey: 'UserId'})
+User.hasMany(Scroll ,{ as: 'UserSrolls' , foreignKey: 'UserId'})
+
 UserResourse.hasOne(Resourse ,{ as: 'Res' , foreignKey:'ResourseId' })
 
 Magicon.belongsToMany(Skill, { through: MagiconsSkills })
@@ -312,7 +373,7 @@ Characteristics.belongsToMany(Magicon , {through:MagiconsCharacteristics })
 /* TEST WORKING SERVER */
 app.get('/',(req,res)=>
 {
-    const check = "server is working";
+    const check = "Server Is Working / V 0.2 Beta";
     res.status(200).send(check);
 })
 app.get('/time',(req,res)=>
@@ -321,7 +382,46 @@ app.get('/time',(req,res)=>
     res.send(time);
 })
 
-
+/* SCROLLS */
+app.get('/scrolls/:UserId' ,async(req, res) => {
+    try{
+        const scrolls  = await Scroll.findAll({
+            where:{
+                UserId:req.params.UserId
+            }
+        }) 
+        if (scrolls.length == 0) {
+            res.json("null")
+        }
+        else{
+            res.json(scrolls);
+        }
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.post('/scrolls' ,async(req, res) => {
+    try{
+        const {AssetId , RarityId ,UserId }  = req.body;
+        await Scroll.create({AssetId,RarityId,UserId}) 
+        res.json("Success");
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.delete('/scrolls' ,async(req, res) => {
+    try{
+        const {AssetId}  = req.body;
+        await Scroll.destroy({
+            where:{
+                AssetId:AssetId
+            }
+        })
+        res.json("Success");
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
 /* WANDS */
 app.get('/wands/:UserId' ,async(req, res) => {
     try{
@@ -369,8 +469,58 @@ app.get('/lands/:UserId' ,async(req, res) => {
 })
 app.post('/lands' ,async(req, res) => {
     try{
-        const {Name , RarityId ,UserId }  = req.body;
-        await Land.create({Name,RarityId,UserId}) 
+        const {AssetId ,Name , RarityId ,UserId }  = req.body;
+        await Land.create({AssetId,Name,RarityId,UserId}) 
+        res.json("Success");
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.delete('/lands' ,async(req, res) => {
+    try{
+        const {AssetId}  = req.body;
+        await Land.destroy({
+            where:{
+                AssetId:AssetId
+            }
+        })
+        res.json("Success");
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+/* Bases */
+app.get('/bases/:AssetId' ,async(req, res) => {
+    try{
+        const AssetId = req.params.AssetId
+        const bases = await Base.findAll({
+            where:{
+                AssetId:AssetId
+            }, 
+        })
+        res.json(bases);
+        
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.post('/bases' ,async(req, res) => {
+    try{
+        const {Name ,Level , Point ,AssetId }  = req.body;
+        await Base.create({Name ,Level , Point ,AssetId}) 
+        res.json("Success");
+    }catch(e){
+        res.status(500).json(e);
+    }
+})
+app.delete('/bases' ,async(req, res) => {
+    try{
+        const {BaseId}  = req.body;
+        await Base.destroy({
+            where:{
+                BaseId:BaseId
+            }
+        })
         res.json("Success");
     }catch(e){
         res.status(500).json(e);
@@ -395,10 +545,10 @@ app.get('/magicons/:UserId' ,async(req, res) => {
 
 app.post('/magicons', async(req, res) => {
     try{
-        const { MP ,HP ,Speed, Breeding,UserId}  = req.body
+        const { MP ,HP ,Speed, Breeding,AssetId,UserId}  = req.body
         const CharacteristicsId = req.body.Characteristics
         const SkillsId = req.body.SkillsId
-        const magicon = await Magicon.create({MP,HP, Speed, Breeding,UserId,})
+        const magicon = await Magicon.create({MP,HP, Speed, Breeding,AssetId,UserId,})
         const MagiconId = magicon.MagiconId
         for (let i = 0; i < CharacteristicsId.length; i++) {
             await MagiconsCharacteristics.create(
